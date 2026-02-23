@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Super Pump: A Kid's Guide to the Heart</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Chosen Palette: Energetic & Playful (Rose, Cyan, Amber, Indigo) -->
+    <!-- Application Structure Plan: 
+         1. Hero Header: "The Super Pump" theme.
+         2. Cardiac Explorer (Organize/Inform): Interactive chamber and valve selector.
+         3. AI Cardiologist (Interactivity): ✨ Gemini-powered chat for heart questions.
+         4. Heart Stats (Compare): Visualizing heart beats per minute across species.
+         5. Fact Lab (Inform): ✨ Gemini-powered dynamic heart fact generator.
+         6. Interactive Quiz: Fun knowledge check.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #fff1f2; /* Rose-50 */
+        }
+        
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #ffe4e6;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #f43f5e;
+            border-radius: 6px;
+        }
+
+        @keyframes beat {
+            0%, 100% { transform: scale(1); }
+            15% { transform: scale(1.15); }
+            30% { transform: scale(1); }
+            45% { transform: scale(1.15); }
+        }
+        .heart-beat {
+            animation: beat 1.2s infinite ease-in-out;
+        }
+        
+        .ai-glow {
+            box-shadow: 0 0 15px rgba(244, 63, 94, 0.3);
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <header class="bg-rose-500 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <span class="text-3xl heart-beat">❤️</span>
+                <h1 class="text-2xl md:text-3xl font-black tracking-tight">Heart Hero</h1>
+            </div>
+            <nav class="hidden md:flex space-x-6 font-bold">
+                <a href="#anatomy" class="hover:text-amber-300 transition">How it Works</a>
+                <a href="#ai-chat" class="hover:text-amber-300 transition">Ask AI</a>
+                <a href="#charts" class="hover:text-amber-300 transition">Heart Stats</a>
+                <a href="#facts" class="hover:text-amber-300 transition">Fun Facts</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 py-12 space-y-20">
+
+        <!-- INTRO SECTION -->
+        <section class="text-center space-y-6">
+            <div class="inline-block bg-amber-400 text-amber-900 font-bold px-4 py-1 rounded-full transform -rotate-2">
+                Meet Your Body's Engine!
+            </div>
+            <h2 class="text-4xl md:text-6xl font-black text-rose-600">The Super Pump</h2>
+            <p class="text-xl md:text-2xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
+                Your heart is a <span class="text-indigo-500 font-bold">super-strong muscle</span> about the size of your fist. 
+                It never takes a break, pumping blood to every single part of you—from your <span class="bg-rose-200 px-2 rounded">brain to your toes!</span> 🚀
+            </p>
+        </section>
+
+        <!-- SECTION 1: CARDIAC EXPLORER -->
+        <section id="anatomy" class="scroll-mt-24">
+            <div class="mb-8 border-l-8 border-indigo-500 pl-6">
+                <h3 class="text-3xl font-black text-slate-800">1. Explore the Heart Chambers</h3>
+                <p class="text-lg text-slate-600 mt-2">
+                    The heart has four special rooms (chambers) that work together to move blood. Click to see what they do!
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-6 bg-white rounded-3xl p-6 shadow-xl border-4 border-rose-100">
+                <div class="md:col-span-5 flex flex-col gap-3">
+                    <p class="font-bold text-slate-400 uppercase tracking-widest text-sm mb-2">Select a part:</p>
+                    <div id="button-list" class="space-y-2"></div>
+                </div>
+                <div class="md:col-span-7">
+                    <div id="display-card" class="h-full bg-rose-50 rounded-2xl border-2 border-rose-200 p-8 flex flex-col justify-center items-center text-center transition-all duration-300">
+                        <div class="text-8xl mb-4 heart-beat">❤️</div>
+                        <h4 class="text-2xl font-bold text-rose-800">Pick a chamber to start the engine!</h4>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: AI CARDIOLOGIST (✨ GEMINI FEATURE) -->
+        <section id="ai-chat" class="scroll-mt-24">
+            <div class="bg-white rounded-3xl p-8 shadow-2xl border-4 border-indigo-400 ai-glow">
+                <div class="flex flex-col md:flex-row gap-8 items-center">
+                    <div class="md:w-1/3 text-center md:text-left">
+                        <div class="text-6xl mb-4">✨🩺</div>
+                        <h3 class="text-3xl font-black text-indigo-600">Ask the AI Cardiologist!</h3>
+                        <p class="text-slate-600 mt-4">
+                            Wondering why you get out of breath or what blood is made of? Ask our AI Heart Expert!
+                        </p>
+                    </div>
+                    <div class="md:w-2/3 w-full">
+                        <div id="chat-container" class="bg-slate-50 rounded-2xl p-4 h-64 overflow-y-auto mb-4 border-2 border-slate-100 flex flex-col gap-3">
+                            <div class="bg-white p-3 rounded-lg shadow-sm border-l-4 border-rose-500 max-w-[90%]">
+                                <p class="text-sm font-bold text-rose-600">AI Cardiologist</p>
+                                <p>Lub-dub! I'm here to answer all your questions about your amazing ticker. Ask away!</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <input type="text" id="ai-input" placeholder="Why does my heart beat fast?" class="flex-1 bg-white border-2 border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-rose-500 font-bold">
+                            <button onclick="askAI()" id="send-btn" class="bg-rose-500 hover:bg-rose-600 text-white font-bold px-6 py-3 rounded-xl transition-all flex items-center gap-2">
+                                ✨ Ask
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: DATA VISUALIZATION (CHARTS) -->
+        <section id="charts" class="scroll-mt-24">
+            <div class="mb-8 border-l-8 border-amber-500 pl-6">
+                <h3 class="text-3xl font-black text-slate-800">3. Heart Stats & Data</h3>
+                <p class="text-lg text-slate-600 mt-2">
+                    How does your heart compare to a Blue Whale or a tiny Hummingbird?
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white rounded-3xl shadow-lg p-6 border-b-8 border-amber-400">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="text-3xl">⏱️</span>
+                        <h4 class="text-xl font-bold text-amber-700">Beats Per Minute</h4>
+                    </div>
+                    <p class="text-slate-600 mb-6 min-h-[50px]">
+                        Smaller animals usually have hearts that beat much faster than ours!
+                    </p>
+                    <div class="chart-container">
+                        <canvas id="bpmChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-3xl shadow-lg p-6 border-b-8 border-rose-400">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="text-3xl">🩸</span>
+                        <h4 class="text-xl font-bold text-rose-600">Daily Pumping Power</h4>
+                    </div>
+                    <p class="text-slate-600 mb-6 min-h-[50px]">
+                        In one single day, your heart pumps enough blood to fill a whole swimming pool!
+                    </p>
+                    <div class="chart-container">
+                        <canvas id="volumeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: FACT LAB (✨ GEMINI FEATURE 2) -->
+        <section id="facts" class="scroll-mt-24">
+            <div class="text-center mb-10">
+                <h3 class="text-4xl font-black text-slate-800 bg-rose-200 inline-block px-6 py-2 rounded-lg transform rotate-1">
+                    Heart Fact Lab! 🧪
+                </h3>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition-shadow border-t-4 border-indigo-400">
+                    <div class="text-4xl mb-3">⚡</div>
+                    <h4 class="text-xl font-bold text-indigo-600 mb-2">Electric Heart</h4>
+                    <p class="text-slate-600">Your heart has its own electrical system! That's why it can keep beating even if it's not inside the body.</p>
+                </div>
+
+                <div class="bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition-shadow border-t-4 border-rose-400">
+                    <div class="text-4xl mb-3">🏃</div>
+                    <h4 class="text-xl font-bold text-rose-600 mb-2">Keep Moving</h4>
+                    <p class="text-slate-600">Exercise makes your heart muscle stronger, just like lifting weights makes your arm muscles grow!</p>
+                </div>
+
+                <div class="bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition-shadow border-t-4 border-amber-400 relative overflow-hidden group">
+                    <div class="flex flex-col h-full justify-between">
+                        <div>
+                            <div class="text-4xl mb-3" id="dynamic-fact-icon">🎁</div>
+                            <h4 class="text-xl font-bold text-amber-600 mb-2" id="dynamic-fact-title">Mystery Heart Fact</h4>
+                            <p class="text-slate-600" id="dynamic-fact-text">Tap the button to let the AI find a secret heart fact for you!</p>
+                        </div>
+                        <button onclick="generateFact()" id="fact-btn" class="mt-4 bg-amber-400 hover:bg-amber-500 text-amber-900 font-bold py-2 px-4 rounded-xl transition-all">
+                            ✨ Generate Fact
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="text-center text-slate-400 py-12">
+            <p>Built for Future Doctors with ✨ Gemini AI Intelligence</p>
+        </footer>
+
+    </main>
+
+    <script>
+        const apiKey = ""; // Provided by environment
+
+        // --- GEMINI API HELPER ---
+        async function callGemini(prompt, systemPrompt) {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] }
+            };
+
+            let delay = 1000;
+            for (let i = 0; i < 5; i++) {
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    const result = await response.json();
+                    return result.candidates?.[0]?.content?.parts?.[0]?.text;
+                } catch (err) {
+                    if (i === 4) throw err;
+                    await new Promise(r => setTimeout(r, delay));
+                    delay *= 2;
+                }
+            }
+        }
+
+        // --- FEATURE 1: AI CARDIOLOGIST ---
+        async function askAI() {
+            const input = document.getElementById('ai-input');
+            const chat = document.getElementById('chat-container');
+            const btn = document.getElementById('send-btn');
+            const userText = input.value.trim();
+            if (!userText) return;
+
+            const userDiv = document.createElement('div');
+            userDiv.className = "bg-rose-100 p-3 rounded-lg self-end max-w-[90%] font-bold text-rose-900";
+            userDiv.innerText = userText;
+            chat.appendChild(userDiv);
+            input.value = "";
+            chat.scrollTop = chat.scrollHeight;
+
+            btn.disabled = true;
+            btn.innerText = "Listening...";
+
+            try {
+                const response = await callGemini(userText, "You are the AI Cardiologist for kids. Explain heart science simply for 7-10 year olds. Use emojis. Max 2 sentences.");
+                const aiDiv = document.createElement('div');
+                aiDiv.className = "bg-white p-3 rounded-lg border-l-4 border-rose-500 shadow-sm max-w-[90%]";
+                aiDiv.innerHTML = `<p class="text-sm font-bold text-rose-600">AI Cardiologist</p><p>${response}</p>`;
+                chat.appendChild(aiDiv);
+            } catch (err) {
+                console.error(err);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "✨ Ask";
+                chat.scrollTop = chat.scrollHeight;
+            }
+        }
+
+        // --- FEATURE 2: FACT GENERATOR ---
+        async function generateFact() {
+            const btn = document.getElementById('fact-btn');
+            const title = document.getElementById('dynamic-fact-title');
+            const text = document.getElementById('dynamic-fact-text');
+            const icon = document.getElementById('dynamic-fact-icon');
+
+            btn.disabled = true;
+            btn.innerText = "Searching...";
+
+            try {
+                const prompt = "Give me 1 fun fact about the heart for kids. Format as: Title: [Short Title] | Fact: [1 sentence fact] | Emoji: [1 emoji]";
+                const response = await callGemini(prompt, "You are a fun science fact generator.");
+                const parts = response.split('|').map(p => p.split(':')[1]?.trim());
+                if (parts.length >= 3) {
+                    title.innerText = parts[0];
+                    text.innerText = parts[1];
+                    icon.innerText = parts[2];
+                }
+            } catch (err) {
+                text.innerText = "The heart beats about 100,000 times a day!";
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "✨ Generate Fact";
+            }
+        }
+
+        // --- CONTENT DATA ---
+        const heartParts = [
+            {
+                id: 'atrium',
+                title: 'Right Atrium',
+                subtitle: 'The Receiving Room',
+                icon: '📩',
+                desc: 'The top-right room where tired, blue blood arrives after traveling through your body.',
+                job: 'It collects the blood that needs fresh oxygen and gets it ready to be pumped to the lungs!',
+                color: 'bg-blue-100 text-blue-900 border-blue-300'
+            },
+            {
+                id: 'ventricle',
+                title: 'Left Ventricle',
+                subtitle: 'The Powerhouse',
+                icon: '💥',
+                desc: 'The strongest part of the heart with thick, muscular walls.',
+                job: 'This chamber gives the big "WHOOSH" that pushes fresh, red blood all the way to your brain and toes!',
+                color: 'bg-rose-100 text-rose-900 border-rose-300'
+            },
+            {
+                id: 'valves',
+                title: 'The Valves',
+                subtitle: 'The Gatekeepers',
+                icon: '🚪',
+                desc: 'Special "one-way doors" inside your heart chambers.',
+                job: 'They snap shut to make sure blood only flows forward, never backward. This makes the "thump-thump" sound!',
+                color: 'bg-amber-100 text-amber-900 border-amber-300'
+            },
+            {
+                id: 'vessels',
+                title: 'Blood Vessels',
+                subtitle: 'The Body Highways',
+                icon: '🛣️',
+                desc: 'A massive system of tubes (arteries and veins) connected to the heart.',
+                job: 'If you laid all your blood vessels in a line, they would wrap around the Earth twice!',
+                color: 'bg-indigo-100 text-indigo-900 border-indigo-300'
+            }
+        ];
+
+        // --- EXPLORER INIT ---
+        const buttonList = document.getElementById('button-list');
+        const displayCard = document.getElementById('display-card');
+
+        function initExplorer() {
+            heartParts.forEach(part => {
+                const btn = document.createElement('button');
+                btn.className = 'w-full text-left p-4 rounded-xl border-2 border-slate-200 hover:border-rose-400 hover:bg-rose-50 hover:shadow-md transition-all flex items-center group bg-white';
+                btn.innerHTML = `<span class="text-2xl mr-3 group-hover:scale-125 transition-transform">${part.icon}</span><div><div class="font-bold text-slate-700">${part.title}</div><div class="text-xs text-slate-400 font-bold uppercase">${part.subtitle}</div></div>`;
+                btn.onclick = () => loadPart(part);
+                buttonList.appendChild(btn);
+            });
+        }
+
+        function loadPart(part) {
+            displayCard.style.opacity = '0';
+            setTimeout(() => {
+                displayCard.className = `h-full rounded-2xl border-4 p-8 flex flex-col items-start text-left transition-all duration-300 shadow-xl ${part.color}`;
+                displayCard.innerHTML = `
+                    <div class="text-6xl mb-4 bg-white/60 p-3 rounded-full shadow-sm">${part.icon}</div>
+                    <h2 class="text-3xl font-black mb-1">${part.title}</h2>
+                    <h3 class="text-lg font-bold opacity-75 mb-6 uppercase tracking-wide">${part.subtitle}</h3>
+                    <div class="bg-white/50 p-4 rounded-xl mb-4 w-full"><p class="font-bold mb-1">What is it?</p><p>${part.desc}</p></div>
+                    <div class="bg-white p-5 rounded-xl w-full mt-auto shadow-sm"><p class="font-bold text-rose-800 mb-1">✨ Special Job:</p><p class="font-semibold">${part.job}</p></div>
+                `;
+                displayCard.style.opacity = '1';
+            }, 200);
+        }
+
+        initExplorer();
+
+        // --- CHART JS ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const wrapLabels = (label) => label.length > 16 ? [label.slice(0, 16), label.slice(16)] : label;
+            const tooltipPlugin = {
+                tooltip: {
+                    callbacks: {
+                        title: (items) => Array.isArray(items[0].chart.data.labels[items[0].dataIndex]) ? items[0].chart.data.labels[items[0].dataIndex].join(' ') : items[0].chart.data.labels[items[0].dataIndex]
+                    }
+                }
+            };
+
+            new Chart(document.getElementById('bpmChart').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: ['Blue Whale', 'Human (Adult)', 'Human (Kid)', 'Hummingbird'].map(wrapLabels),
+                    datasets: [{
+                        label: 'Beats Per Minute',
+                        data: [10, 70, 100, 1200],
+                        backgroundColor: ['#4f46e5', '#f43f5e', '#fbbf24', '#ec4899'],
+                        borderRadius: 12
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { ...tooltipPlugin, legend: { display: false } } }
+            });
+
+            new Chart(document.getElementById('volumeChart').getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Blood Pumping', 'Resting'].map(wrapLabels),
+                    datasets: [{
+                        data: [80, 20],
+                        backgroundColor: ['#f43f5e', '#e2e8f0']
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { ...tooltipPlugin } }
+            });
+        });
+    </script>
+</body>
+</html>
