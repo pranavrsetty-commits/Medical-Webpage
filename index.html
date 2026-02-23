@@ -1,492 +1,296 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Amazing Skull: A Guide for Young Explorers</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
-    
-    <!-- Chosen Palette: Energetic & Playful (Cyan, Pink, Yellow, Purple) -->
-    <!-- Application Structure Plan: 
-         1. Hero Header: Catchy title and introduction.
-         2. Interactive Anatomy Lab (Organize/Inform): A list of skull parts acts as a controller for a dynamic display card. 
-         3. Data Zone (Compare/Relationships): Visualizing abstract concepts like 'Strength' and 'Movement'.
-         4. AI Anatomist (Interactivity): ✨ New Gemini-powered chat for custom questions.
-         5. Fun Facts (Inform): ✨ New Gemini-powered dynamic fact generator.
-         6. Quiz (Interact): Active recall.
-    -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+import React, { useState } from 'react';
+import { 
+  Shield, 
+  MessageSquare, 
+  Smile, 
+  ArrowUpSquare, 
+  Eye, 
+  Wind, 
+  Skull, 
+  Gamepad2, 
+  Sparkles,
+  Box,
+  Trophy,
+  MousePointer2,
+  ChevronRight,
+  Server,
+  Terminal,
+  Code2,
+  Lock
+} from 'lucide-react';
 
-    <style>
-        body {
-            font-family: 'Nunito', sans-serif;
-            background-color: #ecfeff; /* Cyan-50 */
-        }
-        
-        .chart-container {
-            position: relative;
-            width: 100%;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-            height: 300px;
-            max-height: 400px;
-        }
+// --- DATA ---
 
-        @media (min-width: 768px) {
-            .chart-container {
-                height: 350px;
-            }
-        }
+const skullParts = [
+  {
+    id: 'cranium',
+    name: 'The Cranium',
+    nickname: 'The Helmet Mod',
+    color: 'from-blue-500 to-cyan-400',
+    icon: <Shield className="w-8 h-8 text-white" />,
+    description: 'The ultimate armor! This big dome of bone acts like a heavy-duty helmet to protect your brain from taking damage. Every high-level avatar needs one.'
+  },
+  {
+    id: 'mandible',
+    name: 'Mandible',
+    nickname: 'The Chomper',
+    color: 'from-purple-500 to-indigo-400',
+    icon: <MessageSquare className="w-8 h-8 text-white" />,
+    description: 'The only moving part in your skull loadout! It lets you chat with friends, eat pizza, and express your avatar’s emotions.'
+  },
+  {
+    id: 'maxilla',
+    name: 'Maxilla',
+    nickname: 'Upper Jaw HQ',
+    color: 'from-emerald-500 to-teal-400',
+    icon: <ArrowUpSquare className="w-8 h-8 text-white" />,
+    description: 'This bone holds your top row of teeth and builds the center of your face. It’s the foundation of your facial mesh!'
+  },
+  {
+    id: 'zygomatic',
+    name: 'Zygomatic',
+    nickname: 'The Cheek Blocks',
+    color: 'from-amber-400 to-orange-400',
+    icon: <Smile className="w-8 h-8 text-white" />,
+    description: 'The cheekbones! They give your face its structure and make your cheeks pop out when you equip a "Happy" face emote.'
+  },
+  {
+    id: 'orbits',
+    name: 'The Orbits',
+    nickname: 'Eye Sockets',
+    color: 'from-rose-500 to-pink-400',
+    icon: <Eye className="w-8 h-8 text-white" />,
+    description: 'Deep, safe caves built into your skull where your eyeballs sit securely so you can see the whole game map without taking damage.'
+  }
+];
 
-        ::-webkit-scrollbar {
-            width: 12px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #cffafe;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #06b6d4;
-            border-radius: 6px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #0891b2;
-        }
+const lingoCodes = [
+  { 
+    type: 'Prefix', 
+    code: 'Cephal-', 
+    meaning: 'Head', 
+    example: 'Cephalic Armor',
+    color: 'bg-blue-500/20 text-blue-300'
+  },
+  { 
+    type: 'Prefix', 
+    code: 'Crani-', 
+    meaning: 'Skull', 
+    example: 'Craniotomy',
+    color: 'bg-purple-500/20 text-purple-300'
+  },
+  { 
+    type: 'Prefix', 
+    code: 'Rhin-', 
+    meaning: 'Nose', 
+    example: 'Rhinoplasty',
+    color: 'bg-emerald-500/20 text-emerald-300'
+  },
+  { 
+    type: 'Suffix', 
+    code: '-logy', 
+    meaning: 'Study of', 
+    example: 'Zoology',
+    color: 'bg-amber-500/20 text-amber-300'
+  },
+  { 
+    type: 'Suffix', 
+    code: '-plasty', 
+    meaning: 'to repair', 
+    example: 'Rhinoplasty',
+    color: 'bg-rose-500/20 text-rose-300'
+  },
+  { 
+    type: 'Suffix', 
+    code: '-otomy', 
+    meaning: 'To Cut', 
+    example: 'Craniotomy',
+    color: 'bg-indigo-500/20 text-indigo-300'
+  }
+];
 
-        @keyframes pulse-soft {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-        }
-        .ai-glow {
-            box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
-            animation: pulse-soft 3s infinite ease-in-out;
-        }
-    </style>
-</head>
-<body class="text-slate-800">
+const funFacts = [
+  { icon: <Box />, title: "Fusion Level", text: "Babies start with 44 skull pieces! As you level up to an adult, they fuse into 22 strong bones." },
+  { icon: <Shield />, title: "Tank Stats", text: "Your skull is incredibly strong. It can support over 18,000 lbs—that's more than two elephants!" },
+  { icon: <Skull />, title: "Ghost Nose", text: "Skulls have a hole for a nose because the actual nose is made of 'Cartilage' mesh, which disappears over time!" }
+];
 
-    <header class="bg-cyan-500 text-white shadow-lg sticky top-0 z-50">
-        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-            <div class="flex items-center gap-2">
-                <span class="text-3xl">💀</span>
-                <h1 class="text-2xl md:text-3xl font-black tracking-tight">Skull Explorer</h1>
+// --- UI COMPONENTS ---
+
+const LiquidGlass = ({ children, className = "" }) => (
+  <div className={`backdrop-blur-2xl saturate-150 bg-white/10 border border-white/20 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] rounded-[2.5rem] ${className}`}>
+    {children}
+  </div>
+);
+
+const NavDock = ({ activeTab, setActiveTab }) => (
+  <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50">
+    <div className="backdrop-blur-3xl saturate-200 bg-black/40 px-3 py-3 rounded-[2rem] border border-white/10 shadow-2xl flex items-center gap-2">
+      {[
+        { id: 'explore', icon: <Server size={22} />, label: 'Skull Loadout' },
+        { id: 'lingo', icon: <Code2 size={22} />, label: 'Lingo Lab' },
+        { id: 'lore', icon: <Box size={22} />, label: 'Avatar Lore' }
+      ].map((tab) => (
+        <button
+          key={tab.id}
+          onClick={() => setActiveTab(tab.id)}
+          className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-black transition-all duration-300 ${
+            activeTab === tab.id 
+              ? 'bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.3)] scale-105' 
+              : 'text-white/60 hover:text-white hover:bg-white/10'
+          }`}
+        >
+          {tab.icon}
+          <span className="hidden sm:inline tracking-tighter uppercase text-xs">{tab.label}</span>
+        </button>
+      ))}
+    </div>
+  </div>
+);
+
+const ExplorerTab = () => {
+  const [selected, setSelected] = useState(skullParts[0]);
+
+  return (
+    <div className="max-w-6xl mx-auto px-6 animate-fade-in grid lg:grid-cols-12 gap-6 items-start mb-32">
+      <div className="lg:col-span-5 space-y-4">
+        {skullParts.map((part) => (
+          <button
+            key={part.id}
+            onClick={() => setSelected(part)}
+            className={`w-full flex items-center justify-between p-4 rounded-[1.8rem] transition-all duration-300 group border ${
+              selected.id === part.id 
+                ? 'backdrop-blur-3xl bg-white/20 border-white/40 shadow-xl scale-[1.02]' 
+                : 'backdrop-blur-md bg-black/20 border-white/5 hover:bg-white/10'
+            }`}
+          >
+            <div className="flex items-center gap-4 text-left">
+              <div className={`p-3 rounded-2xl bg-gradient-to-br ${part.color} shadow-lg shadow-black/20`}>
+                {part.icon}
+              </div>
+              <div>
+                <h3 className={`font-black text-lg ${selected.id === part.id ? 'text-white' : 'text-white/70'}`}>{part.name}</h3>
+                <p className="text-[10px] text-white/50 font-black uppercase tracking-[0.2em]">{part.nickname}</p>
+              </div>
             </div>
-            <nav class="hidden md:flex space-x-6 font-bold">
-                <a href="#anatomy" class="hover:text-yellow-300 transition">The Parts</a>
-                <a href="#charts" class="hover:text-yellow-300 transition">Skull Stats</a>
-                <a href="#ai-chat" class="hover:text-yellow-300 transition">Ask AI</a>
-                <a href="#facts" class="hover:text-yellow-300 transition">Fun Facts</a>
-            </nav>
+            <ChevronRight className={`transition-transform duration-300 ${selected.id === part.id ? 'text-white translate-x-1' : 'text-white/20'}`} />
+          </button>
+        ))}
+      </div>
+
+      <div className="lg:col-span-7 lg:sticky lg:top-8">
+        <LiquidGlass className="p-10 overflow-hidden relative min-h-[500px] flex flex-col justify-center">
+          <div className={`absolute -top-32 -right-32 w-96 h-96 bg-gradient-to-br ${selected.color} opacity-30 blur-[100px] rounded-full mix-blend-screen transition-all duration-700`}></div>
+          
+          <div className={`inline-flex p-6 rounded-[2rem] bg-gradient-to-br ${selected.color} shadow-[0_20px_40px_rgba(0,0,0,0.4)] mb-10 transform transition-transform duration-500 hover:scale-110 border border-white/30`}>
+            {React.cloneElement(selected.icon, { className: "w-20 h-20 text-white" })}
+          </div>
+          
+          <h2 className="text-5xl font-black text-white mb-4 drop-shadow-md tracking-tight">{selected.name}</h2>
+          <div className="flex gap-2 mb-8">
+            <span className="px-4 py-1.5 rounded-lg bg-black/40 text-cyan-400 font-black text-[10px] border border-cyan-400/30 uppercase tracking-[0.2em]">Armor Class: S-Tier</span>
+            <span className="px-4 py-1.5 rounded-lg bg-black/40 text-white/70 font-black text-[10px] border border-white/10 uppercase tracking-[0.2em]">{selected.nickname}</span>
+          </div>
+          
+          <p className="text-2xl text-white/90 leading-snug font-medium mb-8">
+            {selected.description}
+          </p>
+
+          <div className="flex items-center gap-3 text-white/40 text-xs font-black uppercase tracking-[0.3em]">
+            <Terminal size={14} />
+            <span>Node Status: Secure</span>
+          </div>
+        </LiquidGlass>
+      </div>
+    </div>
+  );
+};
+
+const LingoTab = () => (
+  <div className="max-w-6xl mx-auto px-6 mb-32 animate-fade-in">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {lingoCodes.map((item, i) => (
+        <LiquidGlass key={i} className="p-8 group hover:scale-[1.03] transition-all duration-300 border-white/10 hover:border-white/30">
+          <div className="flex flex-col h-full">
+            <div className={`self-start px-3 py-1 rounded-md mb-6 font-black text-[10px] uppercase tracking-widest ${item.color}`}>
+              {item.type} Unlocked
+            </div>
+            <h3 className="text-4xl font-black text-white mb-2">{item.code}</h3>
+            <p className="text-white/50 font-bold uppercase text-xs tracking-widest mb-6">Means: <span className="text-white">{item.meaning}</span></p>
+            
+            <div className="mt-auto bg-black/20 p-4 rounded-2xl border border-white/5">
+              <p className="text-white/40 text-[10px] font-black uppercase mb-1">Server Usage:</p>
+              <p className="text-lg font-bold text-cyan-400 italic">"{item.example}"</p>
+            </div>
+          </div>
+        </LiquidGlass>
+      ))}
+    </div>
+  </div>
+);
+
+const LoreTab = () => (
+  <div className="max-w-5xl mx-auto px-6 mb-32 animate-fade-in space-y-6">
+    {funFacts.map((fact, i) => (
+      <LiquidGlass key={i} className="p-10 group hover:bg-white/15 transition-all">
+        <div className="flex items-center gap-10">
+          <div className="bg-gradient-to-br from-indigo-500 to-purple-600 p-6 rounded-[2rem] shadow-2xl border border-white/20">
+            {React.cloneElement(fact.icon, { size: 48, className: "text-white" })}
+          </div>
+          <div>
+            <h3 className="text-3xl font-black text-white mb-2 tracking-tight">{fact.title}</h3>
+            <p className="text-xl text-white/70 font-medium leading-relaxed">{fact.text}</p>
+          </div>
         </div>
-    </header>
+      </LiquidGlass>
+    ))}
+  </div>
+);
 
-    <main class="max-w-5xl mx-auto px-4 py-12 space-y-20">
+// --- MAIN APP ---
 
-        <!-- INTRO SECTION -->
-        <section class="text-center space-y-6">
-            <div class="inline-block bg-yellow-400 text-yellow-900 font-bold px-4 py-1 rounded-full transform -rotate-2">
-                Welcome Young Explorers!
-            </div>
-            <h2 class="text-4xl md:text-6xl font-black text-cyan-600">My Amazing Skull</h2>
-            <p class="text-xl md:text-2xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
-                Think of your skull as a built-in <span class="text-pink-500 font-bold">helmet made of bone</span>. 
-                It's like a 3D puzzle that protects your most important treasure: <span class="bg-yellow-200 px-2 rounded">your brain!</span> 🧠
-            </p>
-        </section>
+export default function App() {
+  const [activeTab, setActiveTab] = useState('explore');
 
-        <!-- SECTION 1: ANATOMY EXPLORER -->
-        <section id="anatomy" class="scroll-mt-24">
-            <div class="mb-8 border-l-8 border-pink-500 pl-6">
-                <h3 class="text-3xl font-black text-slate-800">1. Explore the Skull Parts</h3>
-                <p class="text-lg text-slate-600 mt-2">
-                    Click on the buttons below to learn about the different pieces of the puzzle and the special jobs they do.
-                </p>
-            </div>
+  return (
+    <div className="min-h-screen bg-[#08090f] text-white overflow-hidden font-sans">
+      
+      {/* Liquid Mesh Background */}
+      <div className="fixed inset-0 -z-10">
+        <div className="absolute top-[-10%] left-[-10%] w-[60vw] h-[60vw] rounded-full bg-blue-600/20 blur-[150px] animate-pulse" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50vw] h-[50vw] rounded-full bg-purple-600/20 blur-[150px] animate-pulse" style={{ animationDelay: '2s' }} />
+        <div className="absolute inset-0 bg-black/40 backdrop-blur-[80px]" />
+      </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-6 bg-white rounded-3xl p-6 shadow-xl border-4 border-cyan-100">
-                <div class="md:col-span-5 flex flex-col gap-3">
-                    <p class="font-bold text-slate-400 uppercase tracking-widest text-sm mb-2">Select a bone:</p>
-                    <div id="button-list" class="space-y-2"></div>
-                </div>
-                <div class="md:col-span-7">
-                    <div id="display-card" class="h-full bg-cyan-50 rounded-2xl border-2 border-cyan-200 p-8 flex flex-col justify-center items-center text-center transition-all duration-300">
-                        <div class="text-8xl mb-4 animate-bounce">👆</div>
-                        <h4 class="text-2xl font-bold text-cyan-800">Select a part to learn more!</h4>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- SECTION 2: AI ANATOMIST (✨ GEMINI FEATURE 1) -->
-        <section id="ai-chat" class="scroll-mt-24">
-            <div class="bg-white rounded-3xl p-8 shadow-2xl border-4 border-cyan-400 ai-glow">
-                <div class="flex flex-col md:flex-row gap-8 items-center">
-                    <div class="md:w-1/3 text-center md:text-left">
-                        <div class="text-6xl mb-4">✨🤖</div>
-                        <h3 class="text-3xl font-black text-cyan-600">Ask the AI Anatomist!</h3>
-                        <p class="text-slate-600 mt-4">
-                            Got a weird question about your head? Our AI expert knows all the secrets of the skeleton!
-                        </p>
-                    </div>
-                    <div class="md:w-2/3 w-full">
-                        <div id="chat-container" class="bg-slate-50 rounded-2xl p-4 h-64 overflow-y-auto mb-4 border-2 border-slate-100 flex flex-col gap-3">
-                            <div class="bg-white p-3 rounded-lg shadow-sm border-l-4 border-cyan-500 max-w-[90%]">
-                                <p class="text-sm font-bold text-cyan-600">AI Anatomist</p>
-                                <p>Hi! Ask me anything about skulls! For example: "Why is the jaw special?"</p>
-                            </div>
-                        </div>
-                        <div class="flex gap-2">
-                            <input type="text" id="ai-input" placeholder="Type your skull question..." class="flex-1 bg-white border-2 border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:border-cyan-500 font-bold">
-                            <button onclick="askAI()" id="send-btn" class="bg-cyan-500 hover:bg-cyan-600 text-white font-bold px-6 py-3 rounded-xl transition-all flex items-center gap-2">
-                                ✨ Ask
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- SECTION 3: DATA VISUALIZATION (CHARTS) -->
-        <section id="charts" class="scroll-mt-24">
-            <div class="mb-8 border-l-8 border-purple-500 pl-6">
-                <h3 class="text-3xl font-black text-slate-800">3. Skull Statistics</h3>
-                <p class="text-lg text-slate-600 mt-2">
-                    Let's look at some data to see how strong and unique your skull really is!
-                </p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div class="bg-white rounded-3xl shadow-lg p-6 border-b-8 border-purple-400">
-                    <div class="flex items-center gap-3 mb-4">
-                        <span class="text-3xl">💪</span>
-                        <h4 class="text-xl font-bold text-purple-700">How Strong is Bone?</h4>
-                    </div>
-                    <p class="text-slate-600 mb-6 min-h-[50px]">
-                        Did you know? Bone acts as armor. It is actually <strong>stronger than some types of steel</strong>!
-                    </p>
-                    <div class="chart-container">
-                        <canvas id="strengthChart"></canvas>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-3xl shadow-lg p-6 border-b-8 border-pink-400">
-                    <div class="flex items-center gap-3 mb-4">
-                        <span class="text-3xl">🗣️</span>
-                        <h4 class="text-xl font-bold text-pink-600">Moving vs. Fixed Bones</h4>
-                    </div>
-                    <p class="text-slate-600 mb-6 min-h-[50px]">
-                        The skull is a "Fixed Puzzle". Only <strong>one</strong> bone can move freely to let you talk and eat!
-                    </p>
-                    <div class="chart-container">
-                        <canvas id="movementChart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- SECTION 4: FUN FACTS (✨ GEMINI FEATURE 2) -->
-        <section id="facts" class="scroll-mt-24">
-            <div class="text-center mb-10">
-                <h3 class="text-4xl font-black text-slate-800 bg-yellow-200 inline-block px-6 py-2 rounded-lg transform rotate-1">
-                    Fun Skull Facts! 🌟
-                </h3>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="facts-grid">
-                <div class="bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition-shadow border-t-4 border-cyan-400">
-                    <div class="text-4xl mb-3">🧩</div>
-                    <h4 class="text-xl font-bold text-cyan-600 mb-2">The Fixed Puzzle</h4>
-                    <p class="text-slate-600">Most skull bones are "knitted" together tightly and don't move. These special joints are called <strong>sutures</strong>.</p>
-                </div>
-
-                <div class="bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition-shadow border-t-4 border-pink-400">
-                    <div class="text-4xl mb-3">👶</div>
-                    <h4 class="text-xl font-bold text-pink-600 mb-2">Soft Spots</h4>
-                    <p class="text-slate-600">When you are a baby, your skull bones have soft spots to help your head grow as you get bigger!</p>
-                </div>
-
-                <div class="bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition-shadow border-t-4 border-yellow-400 relative overflow-hidden group">
-                    <div class="flex flex-col h-full justify-between">
-                        <div>
-                            <div class="text-4xl mb-3" id="dynamic-fact-icon">🎁</div>
-                            <h4 class="text-xl font-bold text-yellow-600 mb-2" id="dynamic-fact-title">Mystery Fact</h4>
-                            <p class="text-slate-600" id="dynamic-fact-text">Click the button below to discover a new secret fact from the AI!</p>
-                        </div>
-                        <button onclick="generateFact()" id="fact-btn" class="mt-4 bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-bold py-2 px-4 rounded-xl transition-all">
-                            ✨ Get New Fact
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- SECTION 5: QUIZ -->
-        <section class="max-w-2xl mx-auto bg-slate-800 rounded-3xl p-8 md:p-12 text-white shadow-2xl relative overflow-hidden">
-            <div class="absolute top-0 right-0 text-9xl opacity-10 transform translate-x-10 -translate-y-10">❓</div>
-            <h3 class="text-3xl font-black mb-6">Pop Quiz! 🧠</h3>
-            <div class="space-y-6">
-                <div class="bg-slate-700/50 p-6 rounded-xl border border-slate-600">
-                    <p class="font-bold text-xl mb-4">1. Which bone is the "Forehead"?</p>
-                    <div class="grid grid-cols-2 gap-3">
-                        <button onclick="checkAnswer(this, true)" class="quiz-btn bg-slate-600 hover:bg-cyan-500 py-3 rounded-lg font-bold transition">Frontal Bone</button>
-                        <button onclick="checkAnswer(this, false)" class="quiz-btn bg-slate-600 hover:bg-pink-500 py-3 rounded-lg font-bold transition">Mandible</button>
-                    </div>
-                    <p class="feedback hidden mt-3 font-bold"></p>
-                </div>
-            </div>
-        </section>
-
-        <footer class="text-center text-slate-400 py-12">
-            <p>Generated for Young Explorers with ✨ Gemini AI Intelligence</p>
-        </footer>
-
-    </main>
-
-    <script>
-        const apiKey = ""; // API Key is provided by the environment
-
-        // --- GEMINI API HELPER ---
-        async function callGemini(prompt, systemPrompt = "You are a friendly kids science educator.") {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-            const payload = {
-                contents: [{ parts: [{ text: prompt }] }],
-                systemInstruction: { parts: [{ text: systemPrompt }] }
-            };
-
-            let delay = 1000;
-            for (let i = 0; i < 5; i++) {
-                try {
-                    const response = await fetch(url, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-                    const result = await response.json();
-                    if (result.candidates?.[0]?.content?.parts?.[0]?.text) {
-                        return result.candidates[0].content.parts[0].text;
-                    }
-                } catch (err) {
-                    if (i === 4) throw err;
-                    await new Promise(r => setTimeout(r, delay));
-                    delay *= 2;
-                }
-            }
-            throw new Error("Failed to reach AI");
+      <style dangerouslySetInnerHTML={{__html: `
+        .animate-fade-in { animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(40px); }
+          to { opacity: 1; transform: translateY(0); }
         }
+      `}} />
 
-        // --- FEATURE 1: AI ANATOMIST CHAT ---
-        async function askAI() {
-            const input = document.getElementById('ai-input');
-            const chat = document.getElementById('chat-container');
-            const btn = document.getElementById('send-btn');
-            const userText = input.value.trim();
+      {/* Header */}
+      <div className="max-w-6xl mx-auto pt-20 pb-12 px-6 text-center">
+        <div className="inline-flex items-center gap-3 backdrop-blur-xl bg-white/5 px-6 py-2 rounded-2xl border border-white/10 mb-8">
+          <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_10px_#22c55e]" />
+          <span className="text-[10px] font-black uppercase tracking-[0.4em]">Project Cranium v2.0</span>
+        </div>
+        <h1 className="text-7xl md:text-8xl font-black tracking-tighter mb-6 bg-gradient-to-b from-white to-white/40 bg-clip-text text-transparent">
+          SKULL <span className="text-white">BLOX</span>
+        </h1>
+        <p className="text-xl text-white/50 font-bold uppercase tracking-widest max-w-xl mx-auto">
+          Analyzing Avatar Hardware... 100% Complete
+        </p>
+      </div>
 
-            if (!userText) return;
+      <main className="relative z-10">
+        {activeTab === 'explore' && <ExplorerTab />}
+        {activeTab === 'lingo' && <LingoTab />}
+        {activeTab === 'lore' && <LoreTab />}
+      </main>
 
-            // Add user message
-            const userDiv = document.createElement('div');
-            userDiv.className = "bg-cyan-100 p-3 rounded-lg shadow-sm self-end max-w-[90%]";
-            userDiv.innerHTML = `<p class="text-sm font-bold text-cyan-800">You</p><p>${userText}</p>`;
-            chat.appendChild(userDiv);
-            input.value = "";
-            chat.scrollTop = chat.scrollHeight;
-
-            // Loading state
-            btn.disabled = true;
-            btn.innerText = "Thinking...";
-
-            try {
-                const response = await callGemini(
-                    userText, 
-                    "You are the AI Anatomist for a kids website. Explain skull anatomy in simple, fun, and safe terms for an 8-year-old. Keep answers under 3 sentences. Use emojis."
-                );
-                
-                const aiDiv = document.createElement('div');
-                aiDiv.className = "bg-white p-3 rounded-lg shadow-sm border-l-4 border-cyan-500 max-w-[90%]";
-                aiDiv.innerHTML = `<p class="text-sm font-bold text-cyan-600">AI Anatomist</p><p>${response}</p>`;
-                chat.appendChild(aiDiv);
-            } catch (err) {
-                const errDiv = document.createElement('div');
-                errDiv.className = "bg-red-50 p-3 rounded-lg text-red-500 text-sm";
-                errDiv.innerText = "Sorry, my brain is a bit foggy! Try again later.";
-                chat.appendChild(errDiv);
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "✨ Ask";
-                chat.scrollTop = chat.scrollHeight;
-            }
-        }
-
-        // --- FEATURE 2: DYNAMIC FACT GENERATOR ---
-        async function generateFact() {
-            const btn = document.getElementById('fact-btn');
-            const title = document.getElementById('dynamic-fact-title');
-            const text = document.getElementById('dynamic-fact-text');
-            const icon = document.getElementById('dynamic-fact-icon');
-
-            btn.disabled = true;
-            btn.innerText = "✨ Exploring...";
-
-            try {
-                const prompt = "Generate one short, surprising, and fun fact about human skulls or bones that is suitable for children. Include a short 2-3 word title and a single emoji character for that fact. Format as: Title: [Title] | Fact: [Fact] | Emoji: [Emoji]";
-                const response = await callGemini(prompt, "You are a fun science fact generator.");
-                
-                // Simple parsing
-                const parts = response.split('|').map(p => p.split(':')[1]?.trim());
-                if (parts.length >= 3) {
-                    title.innerText = parts[0];
-                    text.innerText = parts[1];
-                    icon.innerText = parts[2];
-                }
-            } catch (err) {
-                text.innerText = "I couldn't find a new fact right now. Did you know your skull is made of 22 bones?";
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "✨ Get New Fact";
-            }
-        }
-
-        // --- DATA OBJECTS ---
-        const skullParts = [
-            {
-                id: 'cranium',
-                title: 'The Cranium',
-                subtitle: 'The Brain Bucket',
-                icon: '🪖',
-                desc: 'The top part of your skull. It is very thick and strong.',
-                job: 'Acts like a hard shell for your brain. Just like a helmet protects you when you ride a bike, the cranium protects your brain all day long!',
-                color: 'bg-blue-100 text-blue-900 border-blue-300'
-            },
-            {
-                id: 'frontal',
-                title: 'Frontal Bone',
-                subtitle: 'The Forehead',
-                icon: '🤔',
-                desc: 'This is the bone right at the front, above your eyes.',
-                job: 'It protects the front part of your brain, which helps you think, learn, and make decisions.',
-                color: 'bg-green-100 text-green-900 border-green-300'
-            },
-            {
-                id: 'maxilla',
-                title: 'The Maxilla',
-                subtitle: 'Upper Jaw',
-                icon: '😬',
-                desc: 'The bone that holds your top teeth and the area under your nose.',
-                job: 'It stays still while you eat and helps hold your face together.',
-                color: 'bg-orange-100 text-orange-900 border-orange-300'
-            },
-            {
-                id: 'mandible',
-                title: 'The Mandible',
-                subtitle: 'Lower Jaw',
-                icon: '🗣️',
-                desc: 'This is the only bone in your skull that moves!',
-                job: 'It allows you to chew your food, talk to your friends, and sing songs.',
-                color: 'bg-red-100 text-red-900 border-red-300'
-            }
-        ];
-
-        // --- INTERACTIVITY: ANATOMY EXPLORER ---
-        const buttonList = document.getElementById('button-list');
-        const displayCard = document.getElementById('display-card');
-
-        function initExplorer() {
-            skullParts.forEach((part) => {
-                const btn = document.createElement('button');
-                btn.className = 'w-full text-left p-4 rounded-xl border-2 border-slate-200 hover:border-cyan-400 hover:bg-cyan-50 hover:shadow-md transition-all flex items-center group bg-white';
-                btn.innerHTML = `
-                    <span class="text-2xl mr-3 group-hover:scale-125 transition-transform">${part.icon}</span>
-                    <div>
-                        <div class="font-bold text-slate-700">${part.title}</div>
-                        <div class="text-xs text-slate-400 font-bold uppercase">${part.subtitle}</div>
-                    </div>
-                `;
-                btn.onclick = () => loadPart(part);
-                buttonList.appendChild(btn);
-            });
-        }
-
-        function loadPart(part) {
-            displayCard.style.opacity = '0';
-            displayCard.style.transform = 'translateY(10px)';
-            setTimeout(() => {
-                displayCard.className = `h-full rounded-2xl border-4 p-8 flex flex-col items-start text-left transition-all duration-300 shadow-xl ${part.color}`;
-                displayCard.innerHTML = `
-                    <div class="w-full flex justify-between items-start mb-4">
-                        <div class="bg-white/60 p-4 rounded-full text-6xl shadow-sm backdrop-blur-sm">${part.icon}</div>
-                        <span class="bg-white/50 px-3 py-1 rounded-full text-xs font-black uppercase tracking-widest">Bone Info</span>
-                    </div>
-                    <h2 class="text-3xl md:text-4xl font-black mb-1">${part.title}</h2>
-                    <h3 class="text-lg font-bold opacity-75 mb-6 uppercase tracking-wide">${part.subtitle}</h3>
-                    <div class="bg-white/50 p-4 rounded-xl mb-4 w-full">
-                        <p class="font-bold text-lg mb-1">What is it?</p>
-                        <p>${part.desc}</p>
-                    </div>
-                    <div class="bg-white p-5 rounded-xl w-full mt-auto shadow-sm">
-                        <p class="font-bold text-lg text-slate-800 mb-1">✨ Special Job:</p>
-                        <p class="font-semibold text-slate-700">${part.job}</p>
-                    </div>
-                `;
-                displayCard.style.opacity = '1';
-                displayCard.style.transform = 'translateY(0)';
-            }, 200);
-        }
-
-        initExplorer();
-
-        // --- QUIZ LOGIC ---
-        function checkAnswer(btn, isCorrect) {
-            const container = btn.parentElement.parentElement;
-            const feedback = container.querySelector('.feedback');
-            if(isCorrect) {
-                btn.className = "quiz-btn bg-green-500 text-white py-3 rounded-lg font-bold transition";
-                feedback.textContent = "🎉 Correct! Great job!";
-                feedback.className = "feedback mt-3 font-bold text-green-400 block animate-bounce";
-            } else {
-                btn.className = "quiz-btn bg-red-500 opacity-50 text-white py-3 rounded-lg font-bold transition";
-                feedback.textContent = "Oops! Try again.";
-                feedback.className = "feedback mt-3 font-bold text-red-300 block";
-            }
-        }
-
-        // --- CHART.JS ---
-        document.addEventListener('DOMContentLoaded', function() {
-            const wrapLabels = (label) => label.length > 16 ? [label.slice(0, 16), label.slice(16)] : label;
-            const tooltipPlugin = {
-                tooltip: {
-                    callbacks: {
-                        title: (items) => Array.isArray(items[0].chart.data.labels[items[0].dataIndex]) ? items[0].chart.data.labels[items[0].dataIndex].join(' ') : items[0].chart.data.labels[items[0].dataIndex]
-                    }
-                }
-            };
-
-            new Chart(document.getElementById('strengthChart').getContext('2d'), {
-                type: 'bar',
-                data: {
-                    labels: ['Wood', 'Plastic', 'Skull Bone', 'Steel'].map(wrapLabels),
-                    datasets: [{
-                        data: [30, 20, 85, 95],
-                        backgroundColor: ['#cbd5e1', '#cbd5e1', '#a855f7', '#64748b'],
-                        borderRadius: 10
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { ...tooltipPlugin, legend: { display: false } } }
-            });
-
-            new Chart(document.getElementById('movementChart').getContext('2d'), {
-                type: 'doughnut',
-                data: {
-                    labels: ['Moving Bones', 'Fixed Bones'].map(wrapLabels),
-                    datasets: [{
-                        data: [1, 20],
-                        backgroundColor: ['#ec4899', '#e2e8f0']
-                    }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { ...tooltipPlugin } }
-            });
-        });
-    </script>
-</body>
-</html>
+      <NavDock activeTab={activeTab} setActiveTab={setActiveTab} />
+    </div>
+  );
+}
